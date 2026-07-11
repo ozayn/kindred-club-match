@@ -1,5 +1,5 @@
 import { AXES, CLUBS, type Axis, type Club } from '../data/clubs'
-import { TASTE_SIGNALS } from '../data/tasteSignals'
+import { TASTE_SIGNALS, type TasteSignal } from '../data/tasteSignals'
 
 export type UserScores = Record<Axis, number>
 
@@ -48,6 +48,10 @@ function normalizePlayerName(name: string): string {
   return name.replace(/\s*\([^)]*\)/g, '').trim().toLowerCase()
 }
 
+function joinFreeText(entries: string[]): string {
+  return entries.join('. ')
+}
+
 function scorePlayerMatches(players: string[], club: Club): string[] {
   const entries = players.map((s) => normalizePlayerName(s)).filter((s) => s.length >= 2)
   if (!entries.length) return []
@@ -70,32 +74,47 @@ function scorePlayerMatches(players: string[], club: Club): string[] {
 export interface TasteSignalNote {
   label: string
   axes: Axis[]
+  source: 'curated' | 'ai'
 }
 
 // For players, teams, or moments that aren't tied to any of our 33 clubs
 // (named in the "players you love" list, or mentioned in the free-text
 // answer), fall back to a hand-curated axis profile so they still shape the
 // taste vector used for matching — instead of being silently inert.
-function findTasteSignals(players: string[], freeText: string) {
-  const lowerFreeText = freeText.toLowerCase()
+// `extraSignals` carries AI-derived signals for entries the curated list
+// doesn't cover (see findUnmatchedEntries + /api/taste-signal).
+function findTasteSignals(players: string[], freeTextEntries: string[], extraSignals: TasteSignal[] = []) {
+  const lowerFreeText = joinFreeText(freeTextEntries).toLowerCase()
   const lowerPlayers = players.map((p) => normalizePlayerName(p))
+  const allSignals = [...TASTE_SIGNALS, ...extraSignals]
 
-  return TASTE_SIGNALS.filter((signal) => {
+  return allSignals.filter((signal) => {
     const inPlayers = lowerPlayers.some((p) => p.includes(signal.match) || signal.match.includes(p))
     const inFreeText = lowerFreeText.includes(signal.match)
     return inPlayers || inFreeText
   })
 }
 
-export function getTasteSignalNotes(players: string[], freeText: string): TasteSignalNote[] {
-  return findTasteSignals(players, freeText).map((s) => ({
+export function getTasteSignalNotes(
+  players: string[],
+  freeTextEntries: string[],
+  extraSignals: TasteSignal[] = [],
+): TasteSignalNote[] {
+  const extraMatches = new Set(extraSignals.map((s) => s.match))
+  return findTasteSignals(players, freeTextEntries, extraSignals).map((s) => ({
     label: s.label,
     axes: Object.keys(s.axes) as Axis[],
+    source: extraMatches.has(s.match) ? 'ai' : 'curated',
   }))
 }
 
-function applyTasteSignalNudges(userScores: UserScores, players: string[], freeText: string): UserScores {
-  const signals = findTasteSignals(players, freeText)
+function applyTasteSignalNudges(
+  userScores: UserScores,
+  players: string[],
+  freeTextEntries: string[],
+  extraSignals: TasteSignal[] = [],
+): UserScores {
+  const signals = findTasteSignals(players, freeTextEntries, extraSignals)
   if (!signals.length) return userScores
 
   const adjusted = { ...userScores }
@@ -108,6 +127,39 @@ function applyTasteSignalNudges(userScores: UserScores, players: string[], freeT
     adjusted[axis] = userScores[axis] * 0.7 + avg * 0.3
   }
   return adjusted
+}
+
+// Entries (named players, or free-text sentences) that neither the club
+// rosters nor the curated taste-signal list recognize — candidates to send
+// to the AI fallback so they aren't silently ignored. Each free-text
+// sentence is checked independently so a curated match in one sentence
+// doesn't hide an unrecognized one in another.
+export function findUnmatchedEntries(players: string[], freeTextEntries: string[]): string[] {
+  const unmatched: string[] = []
+
+  for (const p of players) {
+    const norm = normalizePlayerName(p)
+    if (norm.length < 2) continue
+
+    const isClubTied = CLUBS.some((club) =>
+      [...club.currentStars, ...club.legends].some((cp) => {
+        const normCp = normalizePlayerName(cp)
+        return normCp.includes(norm) || norm.includes(normCp)
+      }),
+    )
+    const isCurated = TASTE_SIGNALS.some((s) => norm.includes(s.match) || s.match.includes(norm))
+    if (!isClubTied && !isCurated) unmatched.push(p)
+  }
+
+  for (const sentence of freeTextEntries) {
+    const trimmed = sentence.trim()
+    if (!trimmed) continue
+    const lower = trimmed.toLowerCase()
+    const isCurated = TASTE_SIGNALS.some((s) => lower.includes(s.match))
+    if (!isCurated) unmatched.push(trimmed)
+  }
+
+  return unmatched
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
@@ -125,17 +177,18 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 export function matchClubs(
   userScores: UserScores,
-  freeText: string,
+  freeTextEntries: string[],
   players: string[],
   leagueFilter?: string,
+  extraSignals: TasteSignal[] = [],
 ): MatchResult[] {
   const axes = AXES.map((a) => a.key)
   const rawUserVec = axes.map((a) => userScores[a])
 
-  // Curated taste signals (players, teams, or moments not tied to a club)
-  // nudge the vector used for ranking; the radar chart below still shows
-  // the raw slider answers.
-  const effectiveScores = applyTasteSignalNudges(userScores, players, freeText)
+  // Curated (and, where available, AI-derived) taste signals nudge the
+  // vector used for ranking; the radar chart below still shows the raw
+  // slider answers.
+  const effectiveScores = applyTasteSignalNudges(userScores, players, freeTextEntries, extraSignals)
   const userVec = axes.map((a) => effectiveScores[a])
 
   const results: MatchResult[] = CLUBS
@@ -147,7 +200,7 @@ export function matchClubs(
 
       // Free-text nudge: small, bounded boost so it visibly matters without
       // overwhelming the structured quiz answers.
-      const { axisHits, tagHits } = scoreFromFreeText(freeText, club)
+      const { axisHits, tagHits } = scoreFromFreeText(joinFreeText(freeTextEntries), club)
       score += Object.keys(axisHits).length * 1.5
       if (tagHits) score += Math.min(tagHits * 3, 9)
 

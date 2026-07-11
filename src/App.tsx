@@ -8,7 +8,7 @@ type Stage = 'intro' | 'quiz' | 'results'
 function App() {
   const [stage, setStage] = useState<Stage>('intro')
   const [userScores, setUserScores] = useState<UserScores | null>(null)
-  const [freeText, setFreeText] = useState('')
+  const [freeText, setFreeText] = useState<string[]>([])
   const [players, setPlayers] = useState<string[]>([])
   const [britishOnly, setBritishOnly] = useState(false)
 

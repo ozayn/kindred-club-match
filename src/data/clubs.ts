@@ -127,7 +127,7 @@ export const CLUBS: Club[] = [
     philosophy: 'Jürgen Klopp’s "heavy metal football" — relentless counter-pressing and vertical intensity — renewed a tradition of passionate, high-tempo attacking play.',
     culture: '"You’ll Never Walk Alone" at Anfield is one of football’s most recognisable expressions of collective solidarity; the fan base sees itself as bound together beyond the game.',
     values: 'Deeply working-class Scouse identity, strong social solidarity culture, and an ownership (Fenway Sports Group) that runs the club on disciplined recruitment analytics rather than reckless spending.',
-    legends: ['Kenny Dalglish', 'Steven Gerrard', 'Ian Rush', 'Mohamed Salah (early era)'],
+    legends: ['Kenny Dalglish', 'Steven Gerrard', 'Ian Rush', 'Harry Kewell', 'Mohamed Salah (early era)'],
     currentStars: ['Mohamed Salah', 'Virgil van Dijk', 'Alexis Mac Allister'],
     rivals: ['Manchester United', 'Everton'],
     tags: ['solidarity', 'working class', 'anfield', 'counter-press', 'community', 'ynwa'],

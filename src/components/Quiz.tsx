@@ -14,18 +14,28 @@ const DEFAULT_SCORES: UserScores = {
 }
 
 interface QuizProps {
-  onComplete: (scores: UserScores, freeText: string, players: string[]) => void
+  onComplete: (scores: UserScores, freeTextEntries: string[], players: string[]) => void
 }
 
 export function Quiz({ onComplete }: QuizProps) {
   const [scores, setScores] = useState<UserScores>(DEFAULT_SCORES)
-  const [freeText, setFreeText] = useState('')
+  const [freeTextEntries, setFreeTextEntries] = useState<string[]>([])
+  const [freeTextInput, setFreeTextInput] = useState('')
   const [showFreeText, setShowFreeText] = useState(false)
   const [players, setPlayers] = useState<string[]>([])
   const [playerInput, setPlayerInput] = useState('')
   const [showPlayers, setShowPlayers] = useState(false)
 
   const setAxis = (axis: Axis, value: number) => setScores((s) => ({ ...s, [axis]: value }))
+
+  const addFreeText = () => {
+    const trimmed = freeTextInput.trim()
+    if (!trimmed) return
+    setFreeTextEntries((entries) => [...entries, trimmed])
+    setFreeTextInput('')
+  }
+
+  const removeFreeText = (i: number) => setFreeTextEntries((entries) => entries.filter((_, idx) => idx !== i))
 
   const suggestions =
     playerInput.trim().length >= 2
@@ -81,15 +91,40 @@ export function Quiz({ onComplete }: QuizProps) {
             <h3 className="font-display text-xl mb-2">In your own words</h3>
             <p className="text-sm text-[var(--muted)] mb-4">
               Anything the sliders didn't capture — a country you love, a player who inspired you,
-              a cause you care about.
+              a cause you care about. Type a sentence and press Enter to add it, then keep going.
             </p>
-            <textarea
-              value={freeText}
-              onChange={(e) => setFreeText(e.target.value)}
-              rows={4}
-              placeholder="e.g. I loved how Cape Verde fought against Argentina at the World Cup..."
-              className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors resize-none"
+            <input
+              type="text"
+              value={freeTextInput}
+              onChange={(e) => setFreeTextInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== 'Enter') return
+                e.preventDefault()
+                addFreeText()
+              }}
+              placeholder="e.g. I loved how Cape Verde fought against Argentina at the World Cup"
+              className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors"
             />
+            {freeTextEntries.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {freeTextEntries.map((entry, i) => (
+                  <li
+                    key={i}
+                    className="text-sm flex items-start justify-between gap-3 border border-[var(--line)] rounded-lg px-4 py-2.5"
+                  >
+                    <span>{entry}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFreeText(i)}
+                      aria-label="Remove"
+                      className="text-[var(--muted)] hover:text-[var(--ink)] leading-none shrink-0"
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>
@@ -165,7 +200,11 @@ export function Quiz({ onComplete }: QuizProps) {
       </div>
 
       <button
-        onClick={() => onComplete(scores, freeText, players)}
+        onClick={() => {
+          const trimmed = freeTextInput.trim()
+          const finalEntries = trimmed ? [...freeTextEntries, trimmed] : freeTextEntries
+          onComplete(scores, finalEntries, players)
+        }}
         className="mt-12 w-full sm:w-auto px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
       >
         Find my club →

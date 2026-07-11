@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { UserScores, MatchResult } from '../lib/match'
-import { matchClubs, getTasteSignalNotes } from '../lib/match'
+import { matchClubs, getTasteSignalNotes, findUnmatchedEntries } from '../lib/match'
+import type { TasteSignal } from '../data/tasteSignals'
 import { AXES } from '../data/clubs'
 import { FitRadar } from './FitRadar'
 import { ClubCard } from './ClubCard'
 
 interface ResultsPageProps {
   userScores: UserScores
-  freeText: string
+  freeText: string[]
   players: string[]
   initialLeague?: string
   onRestart: () => void
@@ -18,16 +19,59 @@ const LEAGUES = ['All', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'L
 export function ResultsPage({ userScores, freeText, players, initialLeague, onRestart }: ResultsPageProps) {
   const [league, setLeague] = useState(initialLeague ?? 'All')
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
+  const [aiSignals, setAiSignals] = useState<TasteSignal[]>([])
+  const [aiLoading, setAiLoading] = useState(false)
+
+  const unmatchedEntries = useMemo(() => findUnmatchedEntries(players, freeText), [players, freeText])
+
+  // Anything the curated taste-signal list doesn't recognize gets a single
+  // batched AI lookup as a fallback. Results merge in once they arrive; the
+  // page already shows a fully deterministic match in the meantime.
+  useEffect(() => {
+    if (!unmatchedEntries.length) {
+      setAiSignals([])
+      return
+    }
+    let cancelled = false
+    setAiLoading(true)
+    fetch('/api/taste-signal', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ entries: unmatchedEntries }),
+    })
+      .then((r) => (r.ok ? r.json() : { results: [] }))
+      .then((data: { results?: { entry: string; label: string; axes: Record<string, number> }[] }) => {
+        if (cancelled) return
+        const signals: TasteSignal[] = (data.results ?? []).map((r) => ({
+          match: r.entry.toLowerCase(),
+          label: r.label,
+          axes: r.axes,
+        }))
+        setAiSignals(signals)
+      })
+      .catch(() => {
+        if (!cancelled) setAiSignals([])
+      })
+      .finally(() => {
+        if (!cancelled) setAiLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [unmatchedEntries])
 
   const results: MatchResult[] = useMemo(
-    () => matchClubs(userScores, freeText, players, league),
-    [userScores, freeText, players, league],
+    () => matchClubs(userScores, freeText, players, league, aiSignals),
+    [userScores, freeText, players, league, aiSignals],
   )
 
   const top = results[0]
   const rest = results.slice(1, 10)
 
-  const traitNotes = useMemo(() => getTasteSignalNotes(players, freeText), [players, freeText])
+  const traitNotes = useMemo(
+    () => getTasteSignalNotes(players, freeText, aiSignals),
+    [players, freeText, aiSignals],
+  )
 
   if (!top) return null
 
@@ -78,14 +122,16 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
         <FitRadar userScores={userScores} clubScores={top.club.scores} color={top.club.color} />
       </div>
 
-      {traitNotes.length > 0 && (
+      {(traitNotes.length > 0 || aiLoading) && (
         <p className="text-xs text-[var(--muted)] mb-10 leading-relaxed">
           {traitNotes.map((n) => (
             <span key={n.label}>
-              Because of <strong className="text-[var(--ink)]">{n.label}</strong>, we nudged your
-              taste profile toward {n.axes.map(axisLabel).join(', ')}.{' '}
+              Because of <strong className="text-[var(--ink)]">{n.label}</strong>
+              {n.source === 'ai' && <span title="AI-inferred, not curated"> (AI-guessed)</span>}, we
+              nudged your taste profile toward {n.axes.map(axisLabel).join(', ')}.{' '}
             </span>
           ))}
+          {aiLoading && <span>Refining your match with a few things we didn't recognize…</span>}
         </p>
       )}
 
