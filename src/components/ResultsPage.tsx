@@ -16,6 +16,7 @@ const LEAGUES = ['All', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'L
 
 export function ResultsPage({ userScores, freeText, players, initialLeague, onRestart }: ResultsPageProps) {
   const [league, setLeague] = useState(initialLeague ?? 'All')
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
 
   const results: MatchResult[] = useMemo(
     () => matchClubs(userScores, freeText, players, league),
@@ -27,10 +28,41 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
 
   if (!top) return null
 
+  async function handleShare() {
+    const shareText = `I matched with ${top.club.name} on Kindred — find your own club:`
+    const url = window.location.origin
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Kindred — find your club', text: shareText, url })
+      } catch {
+        // user cancelled the native share sheet — nothing to do
+      }
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(`${shareText} ${url}`)
+      setShareState('copied')
+      setTimeout(() => setShareState('idle'), 2000)
+    } catch {
+      // Clipboard API blocked or unavailable — fall back to a manual-copy prompt.
+      window.prompt('Copy this link to share:', `${shareText} ${url}`)
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-16 fade-in">
       <p className="text-xs tracking-widest uppercase text-[var(--muted)] mb-3">Your match</p>
-      <h1 className="font-display text-4xl mb-2">{top.club.name}</h1>
+      <div className="flex items-start justify-between gap-4 mb-2">
+        <h1 className="font-display text-4xl">{top.club.name}</h1>
+        <button
+          onClick={handleShare}
+          className="shrink-0 text-xs px-4 py-2 rounded-full border border-[var(--line)] hover:border-[var(--ink)] transition-colors"
+        >
+          {shareState === 'copied' ? 'Link copied ✓' : 'Share ↗'}
+        </button>
+      </div>
       <p className="text-[var(--muted)] mb-8">
         {top.club.league} · {top.club.city}, {top.club.country} · founded {top.club.founded}
       </p>
