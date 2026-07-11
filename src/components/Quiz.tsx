@@ -106,8 +106,9 @@ export function Quiz({ onComplete }: QuizProps) {
           <div>
             <h3 className="font-display text-xl mb-2">Players you love</h3>
             <p className="text-sm text-[var(--muted)] mb-4">
-              Search and pick from current stars or legends. If they play or played for a club in
-              our list, it counts as a strong vote for that club.
+              Search and pick from current stars or legends for a strong vote toward their club.
+              Not finding someone? Press Enter to add any name anyway — it just won't move the
+              score if we don't have them on file.
             </p>
             <div className="relative">
               <input
@@ -118,6 +119,7 @@ export function Quiz({ onComplete }: QuizProps) {
                   if (e.key !== 'Enter') return
                   e.preventDefault()
                   if (suggestions[0]) addPlayer(suggestions[0].name)
+                  else if (playerInput.trim()) addPlayer(playerInput.trim())
                 }}
                 placeholder="Start typing a player name…"
                 className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors"

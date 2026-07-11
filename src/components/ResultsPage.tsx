@@ -29,7 +29,9 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
   if (!top) return null
 
   async function handleShare() {
-    const shareText = `I matched with ${top.club.name} on Kindred — find your own club:`
+    const pct = Math.round(top.score)
+    const tagline = top.club.tags[0]
+    const shareText = `I'm a ${pct}% match for ${top.club.name} (${top.club.league} · ${top.club.city}) on Kindred — "${tagline}" energy. Find your own club:`
     const url = window.location.origin
 
     if (navigator.share) {
