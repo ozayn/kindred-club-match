@@ -2,16 +2,29 @@ import { useState } from 'react'
 import { Quiz } from './components/Quiz'
 import { ResultsPage } from './components/ResultsPage'
 import { ReverseAnalysis } from './components/ReverseAnalysis'
+import { SharedResult } from './components/SharedResult'
 import type { UserScores } from './lib/match'
+import { decodeShareState } from './lib/shareState'
 
-type Stage = 'intro' | 'quiz' | 'results' | 'reverse'
+type Stage = 'intro' | 'quiz' | 'results' | 'reverse' | 'shared'
+
+function initialSharedState() {
+  const raw = new URLSearchParams(window.location.search).get('r')
+  return raw ? decodeShareState(raw) : null
+}
 
 function App() {
-  const [stage, setStage] = useState<Stage>('intro')
+  const [sharedState] = useState(initialSharedState)
+  const [stage, setStage] = useState<Stage>(sharedState ? 'shared' : 'intro')
   const [userScores, setUserScores] = useState<UserScores | null>(null)
   const [freeText, setFreeText] = useState<string[]>([])
   const [players, setPlayers] = useState<string[]>([])
   const [britishOnly, setBritishOnly] = useState(false)
+
+  const goToQuiz = () => {
+    window.history.replaceState({}, '', window.location.pathname)
+    setStage('quiz')
+  }
 
   return (
     <div className="min-h-screen">
@@ -19,7 +32,10 @@ function App() {
         <span className="font-display text-sm tracking-widest uppercase">Kindred</span>
         {stage !== 'intro' && (
           <button
-            onClick={() => setStage('intro')}
+            onClick={() => {
+              window.history.replaceState({}, '', window.location.pathname)
+              setStage('intro')
+            }}
             className="text-xs text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
           >
             Home
@@ -66,6 +82,15 @@ function App() {
             </button>
           </p>
         </div>
+      )}
+
+      {stage === 'shared' && sharedState && (
+        <SharedResult
+          clubId={sharedState.clubId}
+          score={sharedState.score}
+          userScores={sharedState.userScores}
+          onStartQuiz={goToQuiz}
+        />
       )}
 
       {stage === 'reverse' && <ReverseAnalysis onBack={() => setStage('intro')} />}

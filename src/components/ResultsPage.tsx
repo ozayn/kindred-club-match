@@ -3,6 +3,7 @@ import type { UserScores, MatchResult } from '../lib/match'
 import { matchClubs, getTasteSignalNotes, findUnmatchedEntries } from '../lib/match'
 import type { TasteSignal } from '../data/tasteSignals'
 import { AXES } from '../data/clubs'
+import { encodeShareState } from '../lib/shareState'
 import { FitRadar } from './FitRadar'
 import { ClubCard } from './ClubCard'
 
@@ -80,8 +81,9 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
   async function handleShare() {
     const pct = Math.round(top.score)
     const tagline = top.club.tags[0]
-    const shareText = `I'm a ${pct}% match for ${top.club.name} (${top.club.league} · ${top.club.city}) on Kindred — "${tagline}" energy. Find your own club:`
-    const url = window.location.origin
+    const shareText = `I'm a ${pct}% match for ${top.club.name} (${top.club.league} · ${top.club.city}) on Kindred — "${tagline}" energy. See my match and find your own club:`
+    const shareParam = encodeShareState(top.club.id, top.score, userScores)
+    const url = `${window.location.origin}/?r=${encodeURIComponent(shareParam)}`
 
     if (navigator.share) {
       try {
