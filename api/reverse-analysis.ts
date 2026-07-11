@@ -1,8 +1,5 @@
 /// <reference types="node" />
-import { CLUBS, AXES, type Axis } from '../src/data/clubs.js'
-import { stripCodeFences } from './_shared.js'
-
-const AXIS_KEYS = AXES.map((a) => a.key)
+import { AXIS_DEFINITIONS, AXIS_KEYS, type Axis, stripCodeFences } from './_shared.js'
 
 interface VercelLikeRequest {
   method?: string
@@ -13,8 +10,19 @@ interface VercelLikeResponse {
   json(body: unknown): void
 }
 
+interface ClubBrief {
+  name: string
+  league: string
+  history: string
+  philosophy: string
+  culture: string
+  values: string
+  tags: string[]
+  scores: Partial<Record<Axis, number>>
+}
+
 function buildSystemPrompt(): string {
-  const axisDescriptions = AXES.map(
+  const axisDescriptions = AXIS_DEFINITIONS.map(
     (a) => `- ${a.key}: ${a.label} (0 = ${a.low}, 10 = ${a.high})`,
   ).join('\n')
 
@@ -40,15 +48,22 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
   }
 
   const body = req.body as {
-    clubId?: string
+    club?: Partial<ClubBrief>
     ageRange?: string
     nationality?: string
     otherInfo?: string
   }
 
-  const club = CLUBS.find((c) => c.id === body.clubId)
-  if (!club) {
-    res.status(400).json({ error: 'Unknown club' })
+  const club = body.club
+  if (
+    !club ||
+    typeof club.name !== 'string' ||
+    typeof club.history !== 'string' ||
+    typeof club.philosophy !== 'string' ||
+    typeof club.culture !== 'string' ||
+    typeof club.values !== 'string'
+  ) {
+    res.status(400).json({ error: 'Invalid club data' })
     return
   }
 
@@ -60,13 +75,16 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
     .filter(Boolean)
     .join('\n')
 
-  const clubBrief = `Club: ${club.name} (${club.league})
+  const tags = Array.isArray(club.tags) ? club.tags : []
+  const scores = club.scores ?? {}
+
+  const clubBrief = `Club: ${club.name} (${club.league ?? 'unknown league'})
 History: ${club.history}
 Philosophy: ${club.philosophy}
 Culture: ${club.culture}
 Values: ${club.values}
-Tags: ${club.tags.join(', ')}
-Axis scores: ${AXIS_KEYS.map((k) => `${k}=${club.scores[k]}`).join(', ')}`
+Tags: ${tags.join(', ')}
+Axis scores: ${AXIS_KEYS.map((k) => `${k}=${scores[k] ?? 'n/a'}`).join(', ')}`
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {

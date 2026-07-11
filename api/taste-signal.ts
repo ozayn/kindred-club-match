@@ -1,11 +1,8 @@
 /// <reference types="node" />
-import { AXES, type Axis } from '../src/data/clubs.js'
-import { stripCodeFences } from './_shared.js'
-
-const AXIS_KEYS = AXES.map((a) => a.key)
+import { AXIS_DEFINITIONS, AXIS_KEYS, type Axis, stripCodeFences } from './_shared.js'
 
 function buildSystemPrompt(): string {
-  const axisDescriptions = AXES.map(
+  const axisDescriptions = AXIS_DEFINITIONS.map(
     (a) => `- ${a.key}: ${a.label} (0 = ${a.low}, 10 = ${a.high})`,
   ).join('\n')
 

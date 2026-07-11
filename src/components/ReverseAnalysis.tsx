@@ -32,7 +32,21 @@ export function ReverseAnalysis({ onBack }: ReverseAnalysisProps) {
       const res = await fetch('/api/reverse-analysis', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ clubId, ageRange, nationality, otherInfo }),
+        body: JSON.stringify({
+          club: {
+            name: club.name,
+            league: club.league,
+            history: club.history,
+            philosophy: club.philosophy,
+            culture: club.culture,
+            values: club.values,
+            tags: club.tags,
+            scores: club.scores,
+          },
+          ageRange,
+          nationality,
+          otherInfo,
+        }),
       })
       if (!res.ok) throw new Error('request failed')
       const data = await res.json()
