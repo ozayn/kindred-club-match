@@ -1,4 +1,5 @@
-import { CLUBS, AXES, type Axis } from '../src/data/clubs'
+/// <reference types="node" />
+import { CLUBS, AXES, type Axis } from '../src/data/clubs.js'
 
 const AXIS_KEYS = AXES.map((a) => a.key)
 
