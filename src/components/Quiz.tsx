@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AXES, type Axis } from '../data/clubs'
+import { AXES, ALL_PLAYERS, type Axis } from '../data/clubs'
 import { Slider } from './Slider'
 import type { UserScores } from '../lib/match'
 
@@ -14,17 +14,34 @@ const DEFAULT_SCORES: UserScores = {
 }
 
 interface QuizProps {
-  onComplete: (scores: UserScores, freeText: string, players: string) => void
+  onComplete: (scores: UserScores, freeText: string, players: string[]) => void
 }
 
 export function Quiz({ onComplete }: QuizProps) {
   const [scores, setScores] = useState<UserScores>(DEFAULT_SCORES)
   const [freeText, setFreeText] = useState('')
   const [showFreeText, setShowFreeText] = useState(false)
-  const [players, setPlayers] = useState('')
+  const [players, setPlayers] = useState<string[]>([])
+  const [playerInput, setPlayerInput] = useState('')
   const [showPlayers, setShowPlayers] = useState(false)
 
   const setAxis = (axis: Axis, value: number) => setScores((s) => ({ ...s, [axis]: value }))
+
+  const suggestions =
+    playerInput.trim().length >= 2
+      ? ALL_PLAYERS.filter(
+          (p) =>
+            p.name.toLowerCase().includes(playerInput.trim().toLowerCase()) &&
+            !players.includes(p.name),
+        ).slice(0, 6)
+      : []
+
+  const addPlayer = (name: string) => {
+    setPlayers((p) => (p.includes(name) ? p : [...p, name]))
+    setPlayerInput('')
+  }
+
+  const removePlayer = (name: string) => setPlayers((p) => p.filter((n) => n !== name))
 
   return (
     <div className="max-w-xl mx-auto px-6 py-16 fade-in">
@@ -89,16 +106,58 @@ export function Quiz({ onComplete }: QuizProps) {
           <div>
             <h3 className="font-display text-xl mb-2">Players you love</h3>
             <p className="text-sm text-[var(--muted)] mb-4">
-              Current stars or legends, one per line or comma-separated. If they play or played
-              for a club in our list, it counts as a strong vote for that club.
+              Search and pick from current stars or legends. If they play or played for a club in
+              our list, it counts as a strong vote for that club.
             </p>
-            <textarea
-              value={players}
-              onChange={(e) => setPlayers(e.target.value)}
-              rows={3}
-              placeholder="e.g. Haaland, Bellingham, Maradona"
-              className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors resize-none"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={playerInput}
+                onChange={(e) => setPlayerInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return
+                  e.preventDefault()
+                  if (suggestions[0]) addPlayer(suggestions[0].name)
+                }}
+                placeholder="Start typing a player name…"
+                className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors"
+              />
+              {suggestions.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full bg-[var(--paper)] border border-[var(--line)] rounded-lg shadow-md overflow-hidden">
+                  {suggestions.map((s) => (
+                    <button
+                      key={s.name}
+                      type="button"
+                      onClick={() => addPlayer(s.name)}
+                      className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-sm text-left hover:bg-black/[0.03] transition-colors"
+                    >
+                      <span>{s.name}</span>
+                      <span className="text-xs text-[var(--muted)] shrink-0">{s.club}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {players.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {players.map((name) => (
+                  <span
+                    key={name}
+                    className="text-xs pl-3 pr-2 py-1.5 rounded-full border border-[var(--line)] flex items-center gap-2"
+                  >
+                    {name}
+                    <button
+                      type="button"
+                      onClick={() => removePlayer(name)}
+                      aria-label={`Remove ${name}`}
+                      className="text-[var(--muted)] hover:text-[var(--ink)] leading-none"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

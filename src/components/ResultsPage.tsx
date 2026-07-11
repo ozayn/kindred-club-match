@@ -7,7 +7,7 @@ import { ClubCard } from './ClubCard'
 interface ResultsPageProps {
   userScores: UserScores
   freeText: string
-  players: string
+  players: string[]
   initialLeague?: string
   onRestart: () => void
 }

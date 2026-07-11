@@ -47,11 +47,8 @@ function normalizePlayerName(name: string): string {
   return name.replace(/\s*\([^)]*\)/g, '').trim().toLowerCase()
 }
 
-function scorePlayerMatches(playersInput: string, club: Club): string[] {
-  const entries = playersInput
-    .split(/[,\n]/)
-    .map((s) => normalizePlayerName(s))
-    .filter((s) => s.length >= 3)
+function scorePlayerMatches(players: string[], club: Club): string[] {
+  const entries = players.map((s) => normalizePlayerName(s)).filter((s) => s.length >= 2)
   if (!entries.length) return []
 
   const clubPlayers = [...club.currentStars, ...club.legends]
@@ -85,7 +82,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 export function matchClubs(
   userScores: UserScores,
   freeText: string,
-  players: string,
+  players: string[],
   leagueFilter?: string,
 ): MatchResult[] {
   const axes = AXES.map((a) => a.key)

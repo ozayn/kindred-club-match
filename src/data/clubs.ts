@@ -515,3 +515,27 @@ export const CLUBS: Club[] = [
     scores: { tradition: 4, attackingStyle: 6, localRoots: 7, underdog: 7, fanPassion: 6, galacticos: 2, socialIdentity: 4 },
   },
 ]
+
+export interface PlayerSuggestion {
+  name: string
+  club: string
+}
+
+function stripAnnotation(name: string): string {
+  return name.replace(/\s*\([^)]*\)/g, '').trim()
+}
+
+export const ALL_PLAYERS: PlayerSuggestion[] = (() => {
+  const seen = new Set<string>()
+  const list: PlayerSuggestion[] = []
+  for (const club of CLUBS) {
+    for (const raw of [...club.currentStars, ...club.legends]) {
+      const name = stripAnnotation(raw)
+      const key = name.toLowerCase()
+      if (seen.has(key)) continue
+      seen.add(key)
+      list.push({ name, club: club.shortName })
+    }
+  }
+  return list.sort((a, b) => a.name.localeCompare(b.name))
+})()
