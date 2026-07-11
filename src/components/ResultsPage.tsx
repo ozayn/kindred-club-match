@@ -8,13 +8,14 @@ interface ResultsPageProps {
   userScores: UserScores
   freeText: string
   players: string
+  initialLeague?: string
   onRestart: () => void
 }
 
 const LEAGUES = ['All', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1']
 
-export function ResultsPage({ userScores, freeText, players, onRestart }: ResultsPageProps) {
-  const [league, setLeague] = useState('All')
+export function ResultsPage({ userScores, freeText, players, initialLeague, onRestart }: ResultsPageProps) {
+  const [league, setLeague] = useState(initialLeague ?? 'All')
 
   const results: MatchResult[] = useMemo(
     () => matchClubs(userScores, freeText, players, league),

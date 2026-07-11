@@ -109,6 +109,11 @@ export function matchClubs(
       const playerHits = scorePlayerMatches(players, club)
       score += Math.min(playerHits.length * 10, 30)
 
+      // Small tie-breaking jitter so near-identical matches don't always
+      // resolve the same way between quiz attempts — bounded tightly enough
+      // that it can only reorder genuine near-ties, never flip a real gap.
+      score += (Math.random() - 0.5) * 0.6
+
       score = Math.max(0, Math.min(100, score))
 
       const axisFit: Record<Axis, number> = {} as Record<Axis, number>

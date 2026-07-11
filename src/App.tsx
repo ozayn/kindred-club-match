@@ -10,6 +10,7 @@ function App() {
   const [userScores, setUserScores] = useState<UserScores | null>(null)
   const [freeText, setFreeText] = useState('')
   const [players, setPlayers] = useState('')
+  const [britishOnly, setBritishOnly] = useState(false)
 
   return (
     <div className="min-h-screen">
@@ -43,6 +44,16 @@ function App() {
             Start the quiz →
           </button>
           <p className="text-xs text-[var(--muted)] mt-6">Takes about two minutes.</p>
+
+          <label className="flex items-center gap-2 mt-8 text-sm text-[var(--muted)] cursor-pointer w-fit">
+            <input
+              type="checkbox"
+              checked={britishOnly}
+              onChange={(e) => setBritishOnly(e.target.checked)}
+              className="accent-[var(--ink)]"
+            />
+            Only match me against British (Premier League) clubs
+          </label>
         </div>
       )}
 
@@ -62,6 +73,7 @@ function App() {
           userScores={userScores}
           freeText={freeText}
           players={players}
+          initialLeague={britishOnly ? 'Premier League' : 'All'}
           onRestart={() => setStage('intro')}
         />
       )}
