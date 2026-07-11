@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { CLUBS, AXES, type Axis } from '../data/clubs'
+import { FitRadar } from './FitRadar'
 
 interface ReverseAnalysisProps {
   onBack: () => void
@@ -130,7 +131,11 @@ export function ReverseAnalysis({ onBack }: ReverseAnalysisProps) {
       {result && (
         <div className="mt-12 border-t border-[var(--line)] pt-10 fade-in">
           <h2 className="font-display text-2xl mb-4">{club.name}</h2>
-          <p className="text-[var(--ink)] leading-relaxed mb-10">{result.explanation}</p>
+          <p className="text-[var(--ink)] leading-relaxed mb-8">{result.explanation}</p>
+
+          <div className="border border-[var(--line)] rounded-2xl p-6 mb-10 bg-white/50">
+            <FitRadar clubScores={club.scores} color={club.color} />
+          </div>
 
           <div className="space-y-3">
             {AXES.map((axis) => {
