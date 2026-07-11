@@ -1,0 +1,233 @@
+{
+  "arsenal": {
+    "name": "Arsenal",
+    "league": "Premier League",
+    "city": "London",
+    "tag": "possession",
+    "color": "#EF0107"
+  },
+  "man-city": {
+    "name": "Manchester City",
+    "league": "Premier League",
+    "city": "Manchester",
+    "tag": "state-owned",
+    "color": "#6CABDD"
+  },
+  "man-utd": {
+    "name": "Manchester United",
+    "league": "Premier League",
+    "city": "Manchester",
+    "tag": "tradition",
+    "color": "#DA291C"
+  },
+  "liverpool": {
+    "name": "Liverpool",
+    "league": "Premier League",
+    "city": "Liverpool",
+    "tag": "solidarity",
+    "color": "#C8102E"
+  },
+  "chelsea": {
+    "name": "Chelsea",
+    "league": "Premier League",
+    "city": "London",
+    "tag": "modern success",
+    "color": "#034694"
+  },
+  "tottenham": {
+    "name": "Tottenham Hotspur",
+    "league": "Premier League",
+    "city": "London",
+    "tag": "to dare is to do",
+    "color": "#132257"
+  },
+  "newcastle": {
+    "name": "Newcastle United",
+    "league": "Premier League",
+    "city": "Newcastle upon Tyne",
+    "tag": "geordie",
+    "color": "#241F20"
+  },
+  "brighton": {
+    "name": "Brighton & Hove Albion",
+    "league": "Premier League",
+    "city": "Brighton",
+    "tag": "sell-to-buy",
+    "color": "#0057B8"
+  },
+  "real-madrid": {
+    "name": "Real Madrid",
+    "league": "La Liga",
+    "city": "Madrid",
+    "tag": "galacticos",
+    "color": "#FEBE10"
+  },
+  "barcelona": {
+    "name": "FC Barcelona",
+    "league": "La Liga",
+    "city": "Barcelona",
+    "tag": "tiki-taka",
+    "color": "#A50044"
+  },
+  "atletico": {
+    "name": "Atlético Madrid",
+    "league": "La Liga",
+    "city": "Madrid",
+    "tag": "cholismo",
+    "color": "#CB3524"
+  },
+  "athletic-bilbao": {
+    "name": "Athletic Club Bilbao",
+    "league": "La Liga",
+    "city": "Bilbao",
+    "tag": "basque only",
+    "color": "#EE2523"
+  },
+  "sevilla": {
+    "name": "Sevilla FC",
+    "league": "La Liga",
+    "city": "Seville",
+    "tag": "europa league specialists",
+    "color": "#D2001C"
+  },
+  "real-sociedad": {
+    "name": "Real Sociedad",
+    "league": "La Liga",
+    "city": "San Sebastián",
+    "tag": "basque",
+    "color": "#0067B1"
+  },
+  "valencia": {
+    "name": "Valencia CF",
+    "league": "La Liga",
+    "city": "Valencia",
+    "tag": "fallen giant",
+    "color": "#EE3524"
+  },
+  "inter": {
+    "name": "Inter Milan",
+    "league": "Serie A",
+    "city": "Milan",
+    "tag": "catenaccio heritage",
+    "color": "#010E80"
+  },
+  "juventus": {
+    "name": "Juventus",
+    "league": "Serie A",
+    "city": "Turin",
+    "tag": "la vecchia signora",
+    "color": "#000000"
+  },
+  "ac-milan": {
+    "name": "AC Milan",
+    "league": "Serie A",
+    "city": "Milan",
+    "tag": "tactical innovation",
+    "color": "#FB090B"
+  },
+  "napoli": {
+    "name": "Napoli",
+    "league": "Serie A",
+    "city": "Naples",
+    "tag": "maradona",
+    "color": "#12A0D7"
+  },
+  "roma": {
+    "name": "AS Roma",
+    "league": "Serie A",
+    "city": "Rome",
+    "tag": "roman identity",
+    "color": "#8E1F2F"
+  },
+  "fiorentina": {
+    "name": "Fiorentina",
+    "league": "Serie A",
+    "city": "Florence",
+    "tag": "tuscan pride",
+    "color": "#642E8E"
+  },
+  "atalanta": {
+    "name": "Atalanta",
+    "league": "Serie A",
+    "city": "Bergamo",
+    "tag": "giant killers",
+    "color": "#1D74C4"
+  },
+  "bayern": {
+    "name": "Bayern Munich",
+    "league": "Bundesliga",
+    "city": "Munich",
+    "tag": "dominant",
+    "color": "#DC052D"
+  },
+  "dortmund": {
+    "name": "Borussia Dortmund",
+    "league": "Bundesliga",
+    "city": "Dortmund",
+    "tag": "yellow wall",
+    "color": "#FDE100"
+  },
+  "leipzig": {
+    "name": "RB Leipzig",
+    "league": "Bundesliga",
+    "city": "Leipzig",
+    "tag": "corporate club",
+    "color": "#DD0741"
+  },
+  "leverkusen": {
+    "name": "Bayer Leverkusen",
+    "league": "Bundesliga",
+    "city": "Leverkusen",
+    "tag": "neverkusen",
+    "color": "#E32221"
+  },
+  "gladbach": {
+    "name": "Borussia Mönchengladbach",
+    "league": "Bundesliga",
+    "city": "Mönchengladbach",
+    "tag": "the foals",
+    "color": "#00953C"
+  },
+  "st-pauli": {
+    "name": "FC St. Pauli",
+    "league": "Bundesliga",
+    "city": "Hamburg",
+    "tag": "anti-fascist",
+    "color": "#8B4513"
+  },
+  "psg": {
+    "name": "Paris Saint-Germain",
+    "league": "Ligue 1",
+    "city": "Paris",
+    "tag": "state-owned",
+    "color": "#004170"
+  },
+  "marseille": {
+    "name": "Olympique de Marseille",
+    "league": "Ligue 1",
+    "city": "Marseille",
+    "tag": "le classique",
+    "color": "#2FA0DA"
+  },
+  "lyon": {
+    "name": "Olympique Lyonnais",
+    "league": "Ligue 1",
+    "city": "Lyon",
+    "tag": "seven titles",
+    "color": "#0C336B"
+  },
+  "monaco": {
+    "name": "AS Monaco",
+    "league": "Ligue 1",
+    "city": "Monaco",
+    "tag": "tax haven",
+    "color": "#E51120"
+  },
+  "lille": {
+    "name": "Lille OSC",
+    "league": "Ligue 1",
+    "city": "Lille",
+    "tag": "sell-to-buy",
+    "color": "#C90019"
+  }
+}

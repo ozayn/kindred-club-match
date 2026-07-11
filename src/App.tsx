@@ -27,8 +27,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="max-w-2xl mx-auto px-6 pt-10 flex items-center justify-between">
+    <div className="min-h-screen safe-top safe-bottom">
+      <header className="max-w-2xl mx-auto safe-x pt-6 sm:pt-10 flex items-center justify-between">
         <span className="font-display text-sm tracking-widest uppercase">Kindred</span>
         {stage !== 'intro' && (
           <button
@@ -44,19 +44,19 @@ function App() {
       </header>
 
       {stage === 'intro' && (
-        <div className="max-w-xl mx-auto px-6 py-24 fade-in">
+        <div className="max-w-xl mx-auto safe-x px-4 sm:px-6 py-12 sm:py-24 fade-in">
           <p className="text-xs tracking-widest uppercase text-[var(--muted)] mb-6">A club-finder</p>
-          <h1 className="font-display text-5xl leading-[1.1] mb-6">
+          <h1 className="font-display text-4xl sm:text-5xl leading-[1.1] mb-6">
             Find the club that feels like you.
           </h1>
-          <p className="text-[var(--muted)] text-lg leading-relaxed mb-10">
+          <p className="text-[var(--muted)] text-base sm:text-lg leading-relaxed mb-10">
             Enjoyed the World Cup and want somewhere to put your loyalty? Answer a short set of
             questions about history, playing style, fan culture, and what a club should stand for —
             we'll match you against 33 clubs across Europe's top five leagues.
           </p>
           <button
             onClick={() => setStage('quiz')}
-            className="px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
+            className="w-full sm:w-auto min-h-11 px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
           >
             Start the quiz →
           </button>
@@ -116,7 +116,7 @@ function App() {
         />
       )}
 
-      <footer className="max-w-2xl mx-auto px-6 py-16 text-xs text-[var(--muted)]">
+      <footer className="max-w-2xl mx-auto safe-x px-4 sm:px-6 py-12 sm:py-16 text-xs text-[var(--muted)]">
         Built for the joy of picking sides. Data is a curated, qualitative model — not a betting or
         performance product.
       </footer>

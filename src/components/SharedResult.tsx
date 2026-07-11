@@ -14,9 +14,9 @@ export function SharedResult({ clubId, score, userScores, onStartQuiz }: SharedR
   if (!club) return null
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16 fade-in">
+    <div className="max-w-2xl mx-auto safe-x px-4 sm:px-6 py-12 sm:py-16 fade-in">
       <p className="text-xs tracking-widest uppercase text-[var(--muted)] mb-3">A friend's match</p>
-      <h1 className="font-display text-4xl mb-2">{club.name}</h1>
+      <h1 className="font-display text-3xl sm:text-4xl mb-2">{club.name}</h1>
       <p className="text-[var(--muted)] mb-2">
         {club.league} · {club.city}, {club.country} · founded {club.founded}
       </p>
@@ -28,7 +28,7 @@ export function SharedResult({ clubId, score, userScores, onStartQuiz }: SharedR
         <FitRadar userScores={userScores} clubScores={club.scores} color={club.color} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-10 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 text-sm">
         <div>
           <p className="text-xs uppercase tracking-widest text-[var(--muted)] mb-1">Philosophy</p>
           <p className="text-[var(--ink)] leading-relaxed">{club.philosophy}</p>
@@ -41,7 +41,7 @@ export function SharedResult({ clubId, score, userScores, onStartQuiz }: SharedR
 
       <button
         onClick={onStartQuiz}
-        className="px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
+        className="w-full sm:w-auto min-h-11 px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
       >
         Find your own club →
       </button>

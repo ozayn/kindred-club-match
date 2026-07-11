@@ -15,14 +15,15 @@ export function FitRadar({ userScores, clubScores, color }: FitRadarProps) {
   }))
 
   return (
-    <ResponsiveContainer width="100%" height={340}>
-      <RadarChart data={data} outerRadius="72%">
-        <PolarGrid stroke="var(--line)" />
-        <PolarAngleAxis
-          dataKey="axis"
-          tick={{ fill: 'var(--muted)', fontSize: 11 }}
-          tickLine={false}
-        />
+    <div className="w-full min-h-[280px] sm:min-h-[340px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <RadarChart data={data} outerRadius="68%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+          <PolarGrid stroke="var(--line)" />
+          <PolarAngleAxis
+            dataKey="axis"
+            tick={{ fill: 'var(--muted)', fontSize: 10 }}
+            tickLine={false}
+          />
         {userScores && (
           <Radar
             name="You"
@@ -42,6 +43,7 @@ export function FitRadar({ userScores, clubScores, color }: FitRadarProps) {
           strokeWidth={2}
         />
       </RadarChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </div>
   )
 }

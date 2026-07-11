@@ -54,9 +54,9 @@ export function Quiz({ onComplete }: QuizProps) {
   const removePlayer = (name: string) => setPlayers((p) => p.filter((n) => n !== name))
 
   return (
-    <div className="max-w-xl mx-auto px-6 py-16 fade-in">
+    <div className="max-w-xl mx-auto safe-x px-4 sm:px-6 py-12 sm:py-16 fade-in">
       <p className="text-xs tracking-widest uppercase text-[var(--muted)] mb-3">The Quiz</p>
-      <h1 className="font-display text-4xl mb-3">Where do you stand?</h1>
+      <h1 className="font-display text-3xl sm:text-4xl mb-3">Where do you stand?</h1>
       <p className="text-[var(--muted)] mb-10">
         Move each slider to where you genuinely sit. There's no correct answer — a club's whole
         identity, not just its trophy count, is what we're matching against.
@@ -205,7 +205,7 @@ export function Quiz({ onComplete }: QuizProps) {
           const finalEntries = trimmed ? [...freeTextEntries, trimmed] : freeTextEntries
           onComplete(scores, finalEntries, players)
         }}
-        className="mt-12 w-full sm:w-auto px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
+        className="mt-12 w-full sm:w-auto min-h-11 px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity"
       >
         Find my club →
       </button>

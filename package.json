@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/generate-icons.mjs && npm run share-meta && tsc -b && vite build",
+    "icons": "node scripts/generate-icons.mjs",
+    "share-meta": "tsx scripts/generate-share-meta.ts",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -13,7 +15,8 @@
     "framer-motion": "^12.42.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "recharts": "^3.9.2"
+    "recharts": "^3.9.2",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.2",
@@ -25,7 +28,9 @@
     "oxlint": "^1.71.0",
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.2",
+    "tsx": "^4.21.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vite-plugin-pwa": "^1.3.0"
   }
 }

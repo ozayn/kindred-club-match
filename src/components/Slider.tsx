@@ -17,7 +17,7 @@ export function Slider({ label, low, high, blurb, value, onChange, index, total 
           {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
         </span>
       </div>
-      <h3 className="font-display text-2xl mb-1">{label}</h3>
+      <h3 className="font-display text-xl sm:text-2xl mb-1">{label}</h3>
       <p className="text-sm text-[var(--muted)] mb-6 max-w-md">{blurb}</p>
       <input
         type="range"

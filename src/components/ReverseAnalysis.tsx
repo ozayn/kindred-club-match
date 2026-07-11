@@ -60,9 +60,9 @@ export function ReverseAnalysis({ onBack }: ReverseAnalysisProps) {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-6 py-16 fade-in">
+    <div className="max-w-xl mx-auto safe-x px-4 sm:px-6 py-12 sm:py-16 fade-in">
       <p className="text-xs tracking-widest uppercase text-[var(--muted)] mb-3">Reverse analysis</p>
-      <h1 className="font-display text-4xl mb-3">Already have a club?</h1>
+      <h1 className="font-display text-3xl sm:text-4xl mb-3">Already have a club?</h1>
       <p className="text-[var(--muted)] mb-10">
         Tell us who you support and a little about yourself — we'll try to explain why, grounded in
         the club's own history and identity, not guesswork about who you are.
@@ -121,7 +121,7 @@ export function ReverseAnalysis({ onBack }: ReverseAnalysisProps) {
       <button
         onClick={handleAnalyze}
         disabled={loading}
-        className="mt-10 w-full sm:w-auto px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity disabled:opacity-50"
+        className="mt-10 w-full sm:w-auto min-h-11 px-8 py-4 bg-[var(--ink)] text-[var(--paper)] rounded-full text-sm tracking-wide hover:opacity-90 transition-opacity disabled:opacity-50"
       >
         {loading ? 'Analyzing…' : 'Explain my club →'}
       </button>

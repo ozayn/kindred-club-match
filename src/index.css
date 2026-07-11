@@ -18,6 +18,8 @@ body {
   color: var(--ink);
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 .font-display {
@@ -29,7 +31,21 @@ body {
   color: var(--paper);
 }
 
-/* minimal custom range slider */
+/* safe-area padding for notched phones / PWA standalone */
+.safe-x {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.safe-top {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+.safe-bottom {
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+/* touch-friendly range slider */
 input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
@@ -38,13 +54,14 @@ input[type='range'] {
   background: var(--line);
   border-radius: 999px;
   outline: none;
+  touch-action: pan-y;
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: var(--ink);
   cursor: pointer;
@@ -58,8 +75,8 @@ input[type='range']::-webkit-slider-thumb:hover {
 }
 
 input[type='range']::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: var(--ink);
   cursor: pointer;
@@ -74,4 +91,10 @@ input[type='range']::-moz-range-thumb {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
 }

@@ -25,7 +25,7 @@ export function ClubCard({ result, rank, defaultOpen = false }: ClubCardProps) {
     <div className="border border-[var(--line)] rounded-2xl overflow-hidden bg-white/50">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-4 p-5 text-left hover:bg-black/[0.02] transition-colors"
+        className="w-full flex items-center gap-3 sm:gap-4 p-4 sm:p-5 text-left hover:bg-black/[0.02] transition-colors min-h-11"
       >
         <span className="text-xs text-[var(--muted)] w-5 shrink-0">{rank}</span>
         <div
@@ -61,7 +61,7 @@ export function ClubCard({ result, rank, defaultOpen = false }: ClubCardProps) {
           <Field label="Philosophy">{club.philosophy}</Field>
           <Field label="Fan culture">{club.culture}</Field>
           <Field label="Values">{club.values}</Field>
-          <div className="grid grid-cols-2 gap-4 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
               <p className="text-xs uppercase tracking-widest text-[var(--muted)] mb-1">Legends</p>
               <p>{club.legends.join(', ')}</p>
