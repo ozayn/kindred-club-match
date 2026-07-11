@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Quiz } from './components/Quiz'
 import { ResultsPage } from './components/ResultsPage'
+import { ReverseAnalysis } from './components/ReverseAnalysis'
 import type { UserScores } from './lib/match'
 
-type Stage = 'intro' | 'quiz' | 'results'
+type Stage = 'intro' | 'quiz' | 'results' | 'reverse'
 
 function App() {
   const [stage, setStage] = useState<Stage>('intro')
@@ -54,8 +55,20 @@ function App() {
             />
             Only match me against British (Premier League) clubs
           </label>
+
+          <p className="text-sm text-[var(--muted)] mt-10">
+            Already have a club?{' '}
+            <button
+              onClick={() => setStage('reverse')}
+              className="underline underline-offset-4 hover:text-[var(--ink)] transition-colors"
+            >
+              Find out why →
+            </button>
+          </p>
         </div>
       )}
+
+      {stage === 'reverse' && <ReverseAnalysis onBack={() => setStage('intro')} />}
 
       {stage === 'quiz' && (
         <Quiz
