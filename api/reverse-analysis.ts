@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { CLUBS, AXES, type Axis } from '../src/data/clubs.js'
+import { stripCodeFences } from './_shared.js'
 
 const AXIS_KEYS = AXES.map((a) => a.key)
 
@@ -96,7 +97,7 @@ Axis scores: ${AXIS_KEYS.map((k) => `${k}=${club.scores[k]}`).join(', ')}`
 
     const data = (await response.json()) as { content?: { type: string; text?: string }[] }
     const text = data.content?.find((c) => c.type === 'text')?.text ?? ''
-    const parsed = JSON.parse(text) as { explanation?: string; highlightedAxes?: unknown }
+    const parsed = JSON.parse(stripCodeFences(text)) as { explanation?: string; highlightedAxes?: unknown }
 
     const highlightedAxes = Array.isArray(parsed.highlightedAxes)
       ? parsed.highlightedAxes.filter((a): a is Axis => AXIS_KEYS.includes(a as Axis))

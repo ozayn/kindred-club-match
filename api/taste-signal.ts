@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { AXES, type Axis } from '../src/data/clubs.js'
+import { stripCodeFences } from './_shared.js'
 
 const AXIS_KEYS = AXES.map((a) => a.key)
 
@@ -86,7 +87,7 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
 
     const data = (await response.json()) as AnthropicMessage
     const text = data.content?.find((c) => c.type === 'text')?.text ?? ''
-    const parsed = JSON.parse(text) as { results?: unknown }
+    const parsed = JSON.parse(stripCodeFences(text)) as { results?: unknown }
 
     const results = Array.isArray(parsed.results)
       ? parsed.results
