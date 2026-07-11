@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { UserScores, MatchResult } from '../lib/match'
-import { matchClubs } from '../lib/match'
+import { matchClubs, getPlayerTraitNotes } from '../lib/match'
+import { AXES } from '../data/clubs'
 import { FitRadar } from './FitRadar'
 import { ClubCard } from './ClubCard'
 
@@ -26,7 +27,11 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
   const top = results[0]
   const rest = results.slice(1, 10)
 
+  const traitNotes = useMemo(() => getPlayerTraitNotes(players), [players])
+
   if (!top) return null
+
+  const axisLabel = (key: string) => AXES.find((a) => a.key === key)?.label ?? key
 
   async function handleShare() {
     const pct = Math.round(top.score)
@@ -72,6 +77,17 @@ export function ResultsPage({ userScores, freeText, players, initialLeague, onRe
       <div className="border border-[var(--line)] rounded-2xl p-6 mb-4 bg-white/50">
         <FitRadar userScores={userScores} clubScores={top.club.scores} color={top.club.color} />
       </div>
+
+      {traitNotes.length > 0 && (
+        <p className="text-xs text-[var(--muted)] mb-10 leading-relaxed">
+          {traitNotes.map((n) => (
+            <span key={n.player}>
+              Because you named <strong className="text-[var(--ink)]">{n.player}</strong>, we
+              nudged your taste profile toward {n.axes.map(axisLabel).join(', ')}.{' '}
+            </span>
+          ))}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-4 mb-10 text-sm">
         <SummaryStat label="Philosophy" value={top.club.philosophy} />

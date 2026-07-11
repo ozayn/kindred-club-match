@@ -1,4 +1,5 @@
 import { AXES, CLUBS, type Axis, type Club } from '../data/clubs'
+import { PLAYER_TRAITS } from '../data/playerTraits'
 
 export type UserScores = Record<Axis, number>
 
@@ -66,6 +67,43 @@ function scorePlayerMatches(players: string[], club: Club): string[] {
   return [...matched]
 }
 
+export interface PlayerTraitNote {
+  player: string
+  axes: Axis[]
+}
+
+// For players who aren't tied to any of our 33 clubs, fall back to a
+// hand-curated axis profile so naming them still shapes the taste vector
+// used for matching — instead of the name being silently inert.
+export function getPlayerTraitNotes(players: string[]): PlayerTraitNote[] {
+  const notes: PlayerTraitNote[] = []
+  for (const raw of players) {
+    const traits = PLAYER_TRAITS[normalizePlayerName(raw)]
+    if (!traits) continue
+    notes.push({ player: raw, axes: Object.keys(traits) as Axis[] })
+  }
+  return notes
+}
+
+function applyPlayerTraitNudges(userScores: UserScores, players: string[]): UserScores {
+  const traitMatches = players
+    .map((p) => PLAYER_TRAITS[normalizePlayerName(p)])
+    .filter((t): t is Partial<Record<Axis, number>> => !!t)
+
+  if (!traitMatches.length) return userScores
+
+  const adjusted = { ...userScores }
+  for (const axis of AXES.map((a) => a.key)) {
+    const values = traitMatches.map((t) => t[axis]).filter((v): v is number => v !== undefined)
+    if (!values.length) continue
+    const avg = values.reduce((a, b) => a + b, 0) / values.length
+    // Blend lightly — enough to visibly shift the profile without letting a
+    // single named player override what the sliders say.
+    adjusted[axis] = userScores[axis] * 0.7 + avg * 0.3
+  }
+  return adjusted
+}
+
 function cosineSimilarity(a: number[], b: number[]): number {
   let dot = 0
   let magA = 0
@@ -86,7 +124,12 @@ export function matchClubs(
   leagueFilter?: string,
 ): MatchResult[] {
   const axes = AXES.map((a) => a.key)
-  const userVec = axes.map((a) => userScores[a])
+  const rawUserVec = axes.map((a) => userScores[a])
+
+  // Named players not tied to a club nudge the taste vector used for
+  // ranking; the radar chart below still shows the raw slider answers.
+  const effectiveScores = applyPlayerTraitNudges(userScores, players)
+  const userVec = axes.map((a) => effectiveScores[a])
 
   const results: MatchResult[] = CLUBS
     .filter((c) => !leagueFilter || leagueFilter === 'All' || c.league === leagueFilter)
@@ -115,8 +158,10 @@ export function matchClubs(
 
       const axisFit: Record<Axis, number> = {} as Record<Axis, number>
       axes.forEach((a, i) => {
-        // per-axis closeness, 0-100, for the radar chart
-        const diff = Math.abs(userVec[i] - clubVec[i])
+        // per-axis closeness, 0-100, for the radar chart — measured against
+        // the raw slider answers, not the player-trait-nudged vector, so the
+        // chart always reflects what the user actually set.
+        const diff = Math.abs(rawUserVec[i] - clubVec[i])
         axisFit[a] = Math.round(100 - (diff / 10) * 100)
       })
 
