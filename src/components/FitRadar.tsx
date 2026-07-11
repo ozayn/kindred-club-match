@@ -15,7 +15,7 @@ export function FitRadar({ userScores, clubScores, color }: FitRadarProps) {
   }))
 
   return (
-    <div className="w-full min-h-[280px] sm:min-h-[340px]">
+    <div className="w-full h-[280px] sm:h-[340px]">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="68%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
           <PolarGrid stroke="var(--line)" />
