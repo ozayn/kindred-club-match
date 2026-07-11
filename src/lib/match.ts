@@ -1,5 +1,5 @@
 import { AXES, CLUBS, type Axis, type Club } from '../data/clubs'
-import { PLAYER_TRAITS } from '../data/playerTraits'
+import { TASTE_SIGNALS } from '../data/tasteSignals'
 
 export type UserScores = Record<Axis, number>
 
@@ -67,38 +67,44 @@ function scorePlayerMatches(players: string[], club: Club): string[] {
   return [...matched]
 }
 
-export interface PlayerTraitNote {
-  player: string
+export interface TasteSignalNote {
+  label: string
   axes: Axis[]
 }
 
-// For players who aren't tied to any of our 33 clubs, fall back to a
-// hand-curated axis profile so naming them still shapes the taste vector
-// used for matching — instead of the name being silently inert.
-export function getPlayerTraitNotes(players: string[]): PlayerTraitNote[] {
-  const notes: PlayerTraitNote[] = []
-  for (const raw of players) {
-    const traits = PLAYER_TRAITS[normalizePlayerName(raw)]
-    if (!traits) continue
-    notes.push({ player: raw, axes: Object.keys(traits) as Axis[] })
-  }
-  return notes
+// For players, teams, or moments that aren't tied to any of our 33 clubs
+// (named in the "players you love" list, or mentioned in the free-text
+// answer), fall back to a hand-curated axis profile so they still shape the
+// taste vector used for matching — instead of being silently inert.
+function findTasteSignals(players: string[], freeText: string) {
+  const lowerFreeText = freeText.toLowerCase()
+  const lowerPlayers = players.map((p) => normalizePlayerName(p))
+
+  return TASTE_SIGNALS.filter((signal) => {
+    const inPlayers = lowerPlayers.some((p) => p.includes(signal.match) || signal.match.includes(p))
+    const inFreeText = lowerFreeText.includes(signal.match)
+    return inPlayers || inFreeText
+  })
 }
 
-function applyPlayerTraitNudges(userScores: UserScores, players: string[]): UserScores {
-  const traitMatches = players
-    .map((p) => PLAYER_TRAITS[normalizePlayerName(p)])
-    .filter((t): t is Partial<Record<Axis, number>> => !!t)
+export function getTasteSignalNotes(players: string[], freeText: string): TasteSignalNote[] {
+  return findTasteSignals(players, freeText).map((s) => ({
+    label: s.label,
+    axes: Object.keys(s.axes) as Axis[],
+  }))
+}
 
-  if (!traitMatches.length) return userScores
+function applyTasteSignalNudges(userScores: UserScores, players: string[], freeText: string): UserScores {
+  const signals = findTasteSignals(players, freeText)
+  if (!signals.length) return userScores
 
   const adjusted = { ...userScores }
   for (const axis of AXES.map((a) => a.key)) {
-    const values = traitMatches.map((t) => t[axis]).filter((v): v is number => v !== undefined)
+    const values = signals.map((s) => s.axes[axis]).filter((v): v is number => v !== undefined)
     if (!values.length) continue
     const avg = values.reduce((a, b) => a + b, 0) / values.length
     // Blend lightly — enough to visibly shift the profile without letting a
-    // single named player override what the sliders say.
+    // single signal override what the sliders say.
     adjusted[axis] = userScores[axis] * 0.7 + avg * 0.3
   }
   return adjusted
@@ -126,9 +132,10 @@ export function matchClubs(
   const axes = AXES.map((a) => a.key)
   const rawUserVec = axes.map((a) => userScores[a])
 
-  // Named players not tied to a club nudge the taste vector used for
-  // ranking; the radar chart below still shows the raw slider answers.
-  const effectiveScores = applyPlayerTraitNudges(userScores, players)
+  // Curated taste signals (players, teams, or moments not tied to a club)
+  // nudge the vector used for ranking; the radar chart below still shows
+  // the raw slider answers.
+  const effectiveScores = applyTasteSignalNudges(userScores, players, freeText)
   const userVec = axes.map((a) => effectiveScores[a])
 
   const results: MatchResult[] = CLUBS

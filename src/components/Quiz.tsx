@@ -87,7 +87,7 @@ export function Quiz({ onComplete }: QuizProps) {
               value={freeText}
               onChange={(e) => setFreeText(e.target.value)}
               rows={4}
-              placeholder="e.g. I care about clubs that stand for something beyond football..."
+              placeholder="e.g. I loved how Cape Verde fought against Argentina at the World Cup..."
               className="w-full border border-[var(--line)] rounded-lg p-4 text-sm bg-white/60 focus:outline-none focus:border-[var(--ink)] transition-colors resize-none"
             />
           </div>
